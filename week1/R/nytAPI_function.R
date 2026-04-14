@@ -20,7 +20,11 @@ nytAPI_function <- function(term1, begin_date, end_date, api) {
                   snippet=character(), headline=character())
   
   for (i in 0:maxPages) {
-    nytSearch = jsonlite::fromJSON(paste0(url, "&page=", i), flatten = TRUE)
+    nytSearch = tryCatch(
+      jsonlite::fromJSON(paste0(url, "&page=", i), flatten = TRUE),
+      error = function(e) NULL
+    )
+    if (is.null(nytSearch)) break
     temp = data.frame(id = 1:nrow(nytSearch$response$docs),
                       created_time = nytSearch$response$docs$pub_date,
                       snippet = nytSearch$response$docs$snippet,

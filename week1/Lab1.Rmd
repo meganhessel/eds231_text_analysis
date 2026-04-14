@@ -124,6 +124,8 @@ url <- "https://raw.githubusercontent.com/MaRo406/EDS-231-text-sentiment/refs/he
 results <- read_csv(url)
 
 nytDat <- results
+
+nytDat
 ```
 
 Let's visualize our dataset. Plotting \# articles per day let's us ask which days had the most coverage of extreme heat, whether coverage spikes around particular events (e.g. a major heatwave), and the overall pattern of media attention to the topic over time.
@@ -163,11 +165,13 @@ Now we can count word frequencies across all snippets. This raw frequency distri
 
 ```{r word_frequencies}
 tokenized %>%
-  count() %>%
-  filter() %>% 
-  mutate() %>%
-  ggplot(aes()) +
-  geom_col() 
+  count(word, sort = TRUE) %>%
+  filter(n > 15) %>% 
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(n, word)) +
+  geom_col() +
+  labs(y = NULL)
+
 ```
 
 Uh oh, who knows what we need to do here?
@@ -181,9 +185,16 @@ The most frequent words in any corpus are almost always **stop words** — funct
 data(stop_words)
 stop_words
 
-tokenized <- 
+tokenized <- tokenized %>%
+  anti_join(stop_words)
 
-#plot again  
+tokenized %>%
+  count(word, sort = TRUE) %>%
+  filter(n > 8) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(n, word)) +
+  geom_col() +
+  labs(y = NULL)
 
 ```
 
@@ -191,7 +202,7 @@ Let's look at our list of tokens. Does anything stand out?
 
 ```{r inspect-tokens}
 #inspect the list of tokens (words)
-
+tokenized$word
 ```
 
 ### Text Normalization and Cleaning
@@ -200,15 +211,22 @@ Even after removing stop words, raw tokens often contain noise: digits mixed in 
 
 ```{r cleaning, eval=FALSE}
 #remove all numbers
-clean_tokens <-  
+clean_tokens <- str_remove_all(tokenized$word, "[:digit:]") #remove all numbers
 
 #remove possessives
-clean_tokens <- 
+clean_tokens <- gsub("’s", '', clean_tokens) 
 
 # add cleaned tokens back to df
 tokenized$clean <- clean_tokens
 
 #plot again
+tokenized %>%
+  count(clean, sort = TRUE) %>%
+  mutate(clean = reorder(clean, n)) %>%
+  filter(n > 5) %>%
+  ggplot(aes(n, clean)) +
+  geom_col() +
+  labs(y = NULL)
 
 ```
 

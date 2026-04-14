@@ -1,9 +1,13 @@
 ---
-title: "hw1"
+title: "Text Analyst: Lab1"
 format: html
+author: "Megan Hessel"
 ---
 
-Load Libraries 
+## NYT API
+
+Load Libraries
+
 ```{r}
 #| output: false 
 #| warning: false 
@@ -12,21 +16,25 @@ library(jsonlite) #convert results from API queries into R-friendly formats
 library(tidyverse)
 library(tidytext) #text data management and analysis
 library(ggplot2) #plot word frequencies and publication dates
+library(patchwork)
 ```
 
-## **1. ** Create a free [New York Times account](<https://developer.nytimes.com/get-started>)
+## **1.**  Create a free [New York Times account](https://developer.nytimes.com/get-started)
 
 Here is my account's API:
+
 ```{r API-key}
 # API key from NYT account 
-API_KEY <- "KJQmoL1cLoUvouGAKTgFW5kOUHp3wI5XZJ8PIgQSu5EUZXoC"
+#usethis::edit_r_environ()
+API_KEY <- Sys.getenv("NYT_KEY")
 ```
 
-## **2.**  Pick an environmental term of interest to you and use the {jsonlite} package to query the API. P
+## **2.** Pick an environmental term of interest to you and use the {jsonlite} package to query the API. 
 
-ick something high profile enough and over a large enough time frame that your query yields enough articles for an interesting examination.
+Pick something high profile enough and over a large enough time frame that your query yields enough articles for an interesting examination.
 
-I am looking into the broad category of `renewable energy`. 
+I am looking into the broad category of `renewable energy`.
+
 ```{r}
 # Querying "renewable energy" in the New York Times API 
 searchQ = URLencode("renewable energy")
@@ -39,7 +47,8 @@ t = fromJSON(url, flatten = TRUE)
 
 Exploring the results from querying "renewable energy".
 
-*(The outputs of this exploratory code chunk was turned off due to extensive data exploration). *
+*(The outputs of this exploratory code chunk was turned off due to extensive data exploration).*
+
 ```{r}
 #| output: false 
 # Object type 
@@ -58,15 +67,16 @@ t$response$meta$hits
 str(t)
 ```
 
-**However, in class, we did this method (^^) then did not use this data.** 
-**Instead, we made the API function below in order to query the data. I am confused on the data formatting and how to extract information in the first method.**
+**However, in class, we did this method (\^\^) then did not use this data.** **Instead, we made the API function below in order to query the data. I am confused on the data formatting and how to extract information in the first method.**
 
-Get the API function we created in class: 
+Get the API function we created in class:
+
 ```{r}
 source(here::here("R", "nytAPI_function.R"))
 ```
 
 Use the function to query the term `renewable energy` between April 4, 2024 and April 4, 2026 in the NYT.
+
 ```{r}
 results <- nytAPI_function(term1 = "renewable energy", begin_date = "20240401", end_date = "20260401", api = API_KEY)
 term1 <- "renewable energy"
@@ -75,14 +85,17 @@ write.csv(results, paste0("NYT-", term1,".csv"))
 nytDat <- results
 ```
 
-## **3.**  Recreate the publications per day and word frequency plots using the snippets.
+## **3.** Recreate the publications per day and word frequency plots using the snippets.
 
-Investigating the **publish dates**. 
+Investigating the **publish dates** for the snippets (`nytDat$snippet`).
 
-Looking at how many publications there were per day. 
+Looking at how many publications there were per day.
+
+<- Sys.getenv("NYT_KEY")
+
 ```{r}
 # Wrangle and plot `created_time` in the snippets 
-nytDat %>% 
+pub_day_snippet <- nytDat %>% 
   filter(lengths(snippet) > 0) %>% # Filter for when there is snippet information 
   mutate(date = as.Date(created_time)) %>% # Change created_time datatype to date 
   group_by(date) %>% # Look at count per day 
@@ -95,15 +108,17 @@ nytDat %>%
   coord_flip() + 
   labs(x = "Count", 
        y = "Date", 
-       title = "Publications of 'Renewable Energy` in Snippets Per Day\nBetween 2024 and 2026", 
-       subtitle = "High number of publications on September 24, 2025.") + 
+       title = "Publications of 'Renewable Energy`\nin Snippets Per Day", 
+       subtitle = "High number of publications on Sept. 24, 2025.") + 
   theme_minimal()
   
+pub_day_snippet
 ```
 
-Investigating **word frequency** in the snippets (`nytDat$snippet`). 
+Investigating **word frequency** in the snippets (`nytDat$snippet`).
 
-First, we need to clean the tokens: remove stop words, numbers, and possessives 
+First, we need to clean the tokens: remove stop words, numbers, and possessives
+
 ```{r}
 # Look at every words in the snippet column 
 tokenized_snippet <- nytDat %>% 
@@ -124,9 +139,10 @@ tokenized_snippet$clean <- clean_tokens_snippet
 
 ```
 
-After cleaning the tokens, we can now plot the **word frequency**! 
+After cleaning the tokens, we can now plot the **word frequency**!
+
 ```{r}
-tokenized_snippet %>% 
+word_freq_snippet <- tokenized_snippet %>% 
   count(clean, sort = TRUE) %>% # frequency / count
   mutate(clean = reorder(clean, n)) %>% 
   filter(n > 5) %>%  # All counts above 5 
@@ -135,15 +151,18 @@ tokenized_snippet %>%
   geom_col() +
   labs(y = NULL, 
        x = "Count", 
-       title = "Word Frequencies in 'Renewable Energy` NYT Snippets\nBetween 2024 and 2026") + 
+       title = "Word Frequencies in 'Renewable Energy`\nNYT Snippets") + 
   theme_minimal()
+
+word_freq_snippet
 ```
 
-## **4.**  Recreate the publications per day and word frequency plots using the headlines variable.
+## **4.** Recreate the publications per day and word frequency plots using the headlines variable.
 
-The headlines and snippets are from the same publication. Therefore, investigating headlines vs snippets has the same the publications per date. 
+The headlines and snippets are from the same publication. Therefore, investigating headlines vs snippets has the same the publications per date.
+
 ```{r}
-nytDat %>% 
+pub_day_headline <- nytDat %>% 
   filter(lengths(headline) > 0) %>% # Filter for when there is headline information 
   mutate(date = as.Date(created_time)) %>% # Change created_time datatype to date 
   group_by(date) %>% # Look at count per day 
@@ -156,16 +175,17 @@ nytDat %>%
   coord_flip() + 
   labs(x = "Count", 
        y = "Date", 
-       title = "Publications of 'Renewable Energy` in Headlines Per Day\nBetween 2024 and 2026", 
-       subtitle = "High number of publications on September 24, 2025.") + 
+       title = "Publications of 'Renewable Energy`\nin Headlines Per Day", 
+       subtitle = "High number of publications on Sept 24, 2025.") + 
   theme_minimal()
-  
+
+pub_day_headline 
 ```
 
-**The word frequency is different between headlines and snippets. 
-Let's see if there is a big difference!**
+**The word frequency is different between headlines and snippets. Let's see if there is a big difference!**
 
-First, we need to clean the tokens: remove stop words, numbers, and possessives 
+First, we need to clean the tokens: remove stop words, numbers, and possessives
+
 ```{r}
 # Look at every words in the snippet column 
 tokenized_headline <- nytDat %>% 
@@ -185,9 +205,10 @@ clean_tokens_headline <- gsub("’s", '', clean_tokens_headline)
 tokenized_headline$clean <- clean_tokens_headline
 ```
 
-After cleaning the tokens, we can now plot the **word frequency** for headlines! 
+After cleaning the tokens, we can now plot the **word frequency** for headlines!
+
 ```{r}
-tokenized_headline %>% 
+word_freq_headline <- tokenized_headline %>% 
   count(clean, sort = TRUE) %>% 
   mutate(clean = reorder(clean, n)) %>%
   filter(n > 5) %>% 
@@ -195,12 +216,21 @@ tokenized_headline %>%
   geom_col() +
   labs(y = NULL, 
        x = "Count", 
-       title = "Word Frequencies in 'Renewable Energy` NYT Headlines\nBetween 2024 and 2026") + 
+       title = "Word Frequencies in 'Renewable Energy`\nNYT Headlines") + 
   theme_minimal()
+
+word_freq_headline 
 ```
 
-## **4. Pt2**  Compare the distributions of word frequencies between the snippet and headlines. Do you see any differences? Why might this be?
+## **4. Pt2** Compare the distributions of word frequencies between the snippet and headlines. Do you see any differences? Why might this be?
 
-The publications per day are the same for snippets and headlines because they are part of the same publication. 
+```{r}
+# Comparing snippet and headline findings 
+pub_day_snippet | pub_day_headline
 
-For the word frequency, the top words in both lists are similar: 'climate', 'trump', 'wind', 'solar', 'u.s', and 'china'. However, there are more frequent words in the snippets. There are 27 frequent words (occurring more than 5 times) in the snippets. In the headlines, there is only 14 frequent words occurring more than 5 times. This is most likely because the snippets are longer with more words. The frequency numbers are similar between the lists as author try not to be repetitive with word choice. For instance, even though snippets are longer, the author is not trying to say 'climate' 10 times in one snippet. 
+word_freq_snippet | word_freq_headline
+```
+
+The publications per day are the same for snippets and headlines because they are part of the same publication.
+
+For the word frequency, the top words in both lists are similar: 'climate', 'trump', 'wind', 'solar', 'u.s', and 'china'. However, there are more frequent words in the snippets. There are 27 frequent words (occurring more than 5 times) in the snippets. In the headlines, there is only 14 frequent words occurring more than 5 times. This is most likely because the snippets are longer with more words. The frequency numbers are similar between the lists as author try not to be repetitive with word choice. For instance, even though snippets are longer, the author is not trying to say 'climate' 10 times in one snippet.

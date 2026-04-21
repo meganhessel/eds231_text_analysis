@@ -6,6 +6,45 @@ author: "Megan Hessel"
 
 ```{r}
 library(patchwork)
+library(tidyverse)      # data wrangling and plotting
+library(tidytext)       # text mining in tidy format
+#library(LexisNexisTools) # reading Nexis Uni.docx exports
+library(SnowballC)      # Porter stemmer
+library(textstem)       # lemmatization
+library(scales)         # axis formatting
+library(lubridate)      # date handling
+library(quanteda)       # corpus and DFM construction
+library(quanteda.textstats) # textstat_keyness()
+library(quanteda.textplots) # textplot_keyness()
+```
+
+
+```{r}
+#| echo: false
+#| output: false 
+
+# --------- THIS IS FROM CLASS ----- 
+
+# Load data 
+url <- "https://raw.githubusercontent.com/MaRo406/EDS-231-text-sentiment/refs/heads/main/data/nexis-dat.csv"
+df <- read_csv(url)
+
+# Drop articles with no date — these are often metadata rows, not real articles
+df <- df[!is.na(df$date),]
+
+# Remove URLs — Nexis embeds source URLs inline in the text body
+df$text <- gsub("https?\\S+", "", df$text)
+
+# Convert to ASCII — Nexis exports sometimes include curly quotes, em-dashes,
+# and other Unicode characters that cause issues in tokenization
+df$text <- iconv(df$text, to = "ASCII//TRANSLIT", sub = "") # remove artifacts of other methiod 
+
+# Also, remove possessives
+df$text <- gsub("'s\\b", "", df$text) # removes when boundary of a word ends with 's
+
+standard_sw <- get_stopwords(source = "smart")
+
+tokens_clean <- tokens %>% anti_join(standard_sw, by = "word")
 ```
 
 ## **7. Interpretive questions:**
@@ -20,7 +59,7 @@ The biggest difference in 2025 compared to 2021 is the high frequency of 'Trump'
 
 -   Sam Altman is the CEO of Open AI.
 
--   Marcos might refers to the San Marcos Data Center project. The \$1.5 billion, 200 megawatt project was highly protested within the community and was rejected in the San Marcos City Council in February of 2026. Or it might refer to the Phillippines' Marcos administration as the Phillippines become a regional data center hub. 
+-   Marcos might refers to the San Marcos Data Center project. The \$1.5 billion, 200 megawatt project was highly protested within the community and was rejected in the San Marcos City Council in February of 2026. Or it might refer to the Phillippines' Marcos administration as the Phillippines become a regional data center hub.
 
 -   Steve Bannon was employed as the White House chief strategist under Trump.
 
@@ -30,14 +69,13 @@ I am surprised these names occurred enough to flag them. This illustrates that c
 
 3.  Keyness flags statistical unusualness, not substantive importance. A high-G² word could be driven by a single prolific source or a short news spike. How would you check whether a keyword is genuinely distributed across the corpus rather than concentrated in one place?
 
-You can check by investigating overall frequency, frequency by source, and monthly frequency. This checks distribution of words on various levels: source, overtime, and overall, making sure the words are not concentrated in one place. 
+You can check by investigating overall frequency, frequency by source, and monthly frequency. This checks distribution of words on various levels: source, overtime, and overall, making sure the words are not concentrated in one place.
 
 4.  How has the language used to describe data centers in news coverage changed over time, and what does that suggest about the evolving journalistic frame around the issue?
 
+In 2021, the language is more localized, technical, and business oriented. In 2025, the language shifts towards more national contentment and energy politics. The language has changed from being about "where and who is building the infrastructure" to "how is the infrastructure impacting political and electrical power".
 
-In 2021, the language is more localized, technical, and business oriented. In 2025, the language shifts towards more national contentment and energy politics. The language has changed from being about "where and who is building the infrastructure" to "how is the infrastructure impacting political and electrical power".  
-
-But, we have to be careful when using Keyness because it only shows the relative change. There can be similarities between time frames, but they are not shown because they are stable. 
+But, we have to be careful when using Keyness because it only shows the relative change. There can be similarities between time frames, but they are not shown because they are stable.
 
 ------------------------------------------------------------------------
 
@@ -45,106 +83,182 @@ But, we have to be careful when using Keyness because it only shows the relative
 
 1.  **Stopword sensitivity:** Remove *all* domain-specific stopwords and re-run the frequency plot. Then add 10 more domain stopwords beyond what was provided. How do your results change? What does this tell you about the analytical choices embedded in preprocessing?
 
-    *Your answer here*
-I REALLY DO NOT UNDERSTAND WHAT THEY WANT ME TO DO. HOW DO I PICK THE WORDS TO GET RIDE OF. THIS SEEMS BIAS TO JUST REMOVE WORDS BECAUSE "**I** DONT THINK THEY ARE RELEVENT". 
+    Frequency plot when removing all domain-specific stopwords from class
+
+    ```{r stopword-sensitivity}
+    # Remove all domain-specidic stopwords 
+    domain_sw <- tibble(word = c(
+    # News wire / attribution boilerplate
+    "said", "says", "told", "according", "reported", "noted", "added",
+    "stated", "announced", "mr", "ms", "inc", "corp", "llc",
+    # Generic quantitative terms ##(adjust based on your research question)
+    "year", "years", "percent", "million", "billion", "quarter",
+    "company", "companies", "firm", "business",
+    # Consider whether these are substantive for our RQ:
+    "data", "center", "centers" 
+      ))
+      
+    # Remove domain-specidic stopwords 
+    tokens_clean <- tokens_clean |>
+      anti_join(domain_sw, by = "word") |>
+      filter(
+        !str_detect(word, "^[0-9]+$"),    #remove pure digit tokens... No pure numbers
+        str_length(word) > 2            #remove very short tokens
+      )
+      
+      # Re-Run the frequency plot 
+    top_words <- tokens_clean |>
+      count(word, sort = TRUE) |>
+      slice_head(n = 30)
+      
+    frequency_plot1 <- top_words |>
+      ggplot(aes(x = reorder(word, n), y = n)) +
+      geom_col(fill = "#1a9641") +
+      coord_flip() +
+      labs(
+        title = "30 Most Frequent Terms\nData Center Corpus",
+        subtitle = "Class Stopwords", 
+        x = NULL, 
+        y = "Frequency"
+      ) +
+      theme_minimal(base_size = 13)
+    ```
+
+    Frequency plot - Adding 10 more domain stopwords beyond what was provided
+
     ```{r stopword-sensitivity}
 
-  # Remove all domain-specidic stopwords 
-  domain_sw <- tibble(word = c(
-   # News wire / attribution boilerplate
+    # Remove all domain-specidic stopwords + 10 more 
+    domain_sw <- tibble(word = c(
+    # News wire / attribution boilerplate
     "said", "says", "told", "according", "reported", "noted", "added",
     "stated", "announced", "mr", "ms", "inc", "corp", "llc",
     # Generic quantitative terms ##(adjust based on your research question)
     "year", "years", "percent", "million", "billion", "quarter",
     "company", "companies", "firm", "business",
     # Consider whether these are substantive for our RQ:
-    "data", "center", "centers" 
-  ))
+    "data", "center", "centers",
+    # Adding 10 more words 
+    "make", "time", "published", "devine", "memoir", "loving", "mind", "inspired", "drawn", "study", "family", "long", "remarkable", "thought", "pad", "decided", "thesis", "information", "views", "maps", "wonderful", "end", "experiences", "working", "work", "based", "project", "country"))
       
-  # Remove domain-specidic stopwords 
-  tokens_clean <- tokens_clean |>
-    anti_join(domain_sw1, by = "word") |>
-    filter(
-      !str_detect(word, "^[0-9]+$"),    #remove pure digit tokens... No pure numbers 
-      str_length(word) > 2            #remove very short tokens
-  )
-  
-  # Re-Run the frequency plot 
-  top_words <- tokens_clean |>
-    count(word, sort = TRUE) |>
-    slice_head(n = 30)
-  
-  frequency_plot1 <- top_words |>
-    ggplot(aes(x = reorder(word, n), y = n)) +
-    geom_col(fill = "#1a9641") +
-    coord_flip() +
-    labs(
-      title = "30 Most Frequent Terms — Data Center Corpus",
-      subtitle = "After stopword removal and lemmatization",
-      x = NULL,
-      y = "Frequency"
-    ) +
-    theme_minimal(base_size = 13)
+      # Remove domain-specidic stopwords 
+    tokens_clean2 <- tokens_clean |>
+      anti_join(domain_sw, by = "word") |>
+      filter(
+        !str_detect(word, "^[0-9]+$"),
+        #remove pure digit tokens... No pure numbers
+        str_length(word) > 2            #remove very short tokens
+      )
       
-  # ------- 
-  
- # Remove all domain-specidic stopwords + 10 more 
-  domain_sw <- tibble(word = c(
-   # News wire / attribution boilerplate
-    "said", "says", "told", "according", "reported", "noted", "added",
-    "stated", "announced", "mr", "ms", "inc", "corp", "llc",
-    # Generic quantitative terms ##(adjust based on your research question)
-    "year", "years", "percent", "million", "billion", "quarter",
-    "company", "companies", "firm", "business",
-    # Consider whether these are substantive for our RQ:
-    "data", "center", "centers" 
-    # Add 10 more words 
-  ))
+    # Re-Run the frequency plot
+    top_words2 <- tokens_clean2 |>
+      count(word, sort = TRUE) |>
+      slice_head(n = 30)
       
-  # Remove domain-specidic stopwords 
-  tokens_clean <- tokens_clean |>
-    anti_join(domain_sw1, by = "word") |>
-    filter(
-      !str_detect(word, "^[0-9]+$"),    #remove pure digit tokens... No pure numbers 
-      str_length(word) > 2            #remove very short tokens
-  )
-  
-  # Re-Run the frequency plot 
-  top_words <- tokens_clean |>
-    count(word, sort = TRUE) |>
-    slice_head(n = 30)
-  
-  frequency_plot2 <- top_words |>
-    ggplot(aes(x = reorder(word, n), y = n)) +
-    geom_col(fill = "#1a9641") +
-    coord_flip() +
-    labs(
-      title = "30 Most Frequent Terms — Data Center Corpus",
-      subtitle = "After stopword removal and lemmatization",
-      x = NULL,
-      y = "Frequency"
-    ) +
-    theme_minimal(base_size = 13)
-  
-  # Compare the 2 plots 
-  frequency_plot1 | frequency_plot2
-  
+    frequency_plot2 <- top_words2 |>
+      ggplot(aes(x = reorder(word, n), y = n)) +
+      geom_col(fill = "#1a9641") +
+      coord_flip() +
+      labs(
+        title = "30 Most Frequent Terms\nData Center Corpus",
+        subtitle = "Class Stopwords + More",
+        x = NULL,
+        y = "Frequency"
+      ) +
+      theme_minimal(base_size = 13)
+      
     ```
+
+    Comparing the Frequency plots
+
+    ```{r}
+    # Compare the 2 plots
+    frequency_plot1 | frequency_plot2
+    ```
+
+    All decisions during the preprocessing stage must be met with reason and deliberate thought. Removing vs not removing specific words impact in the results. For instance, the first frequency plot includes words like 'project' and 'make'. Whereas in the second frequency, I removed these words. Preprocessing has a direct impact on the results and must be treated with thought.
 
 2.  **Alternative keyness comparison:** Instead of comparing time periods, compare the two sources with the most articles. What does keyness reveal about how each publication frames the data center beat?
 
-    *Your answer here*
+    CE Noticias Financieras English and New York Times has the most articles
 
-    ```{r alternative-keyness}
+    ```{r}
+    # See who the top news sources are
+    top_articles <- df %>% 
+      group_by(source) %>% 
+      summarise(count = n()) %>% 
+      arrange(desc(count)) %>% 
+      slice(1:2)
 
+    top_articles
     ```
+
+    Building a corpus and DFM
+
+    ```{r}
+    #| output: false
+    # Build corpus for the sources 
+    corp2 <- corpus(df, docid_field = "id", text_field = "text") 
+
+    # Cleaning Tokenize inside quanteda: remove punctuation, numbers, symbols; lowercase
+    tokens(corp2,
+           remove_punct   = TRUE,
+           remove_numbers = TRUE,
+           remove_symbols = TRUE) %>% 
+      tokens_tolower() |>
+      tokens_remove(stopwords("en", source = "smart"))
+
+    # Build DFM 
+    dfmat <- dfm(toks)
+    # Drop any documents with no source
+    dfmat <- dfmat[!is.na(docvars(dfmat, "source")), ]
+    ```
+
+```{r}
+    # Look at DFM features 
+    cat("DFM dimensions:", nrow(dfmat), "documents ×", ncol(dfmat), "features\n")
+```
+
+    Define target and reference sub-corpora
+
+    Top two articles: New York Times and CE Noticias Financieras English
+
+    ```{r}
+    # Define Groups 
+    cat("Top source:", top_articles$source[1], "with", sum(docvars(dfmat, "source") == "The New York Times"), "articles", "\n")
+
+    cat("Second-top source:", top_articles$source[2], sum(docvars(dfmat, "source") == "CE Noticias Financieras English"), "articles", "\n")
+
+    # Collapse DFM to two rows — one per year value
+    dfmat_grouped <- dfm_group(dfmat, groups = source)
+    ```
+
+    Compute and plot keyness
+
+    ```{r}
+    result <- textstat_keyness(dfmat_grouped,
+                               target  = "CE Noticias Financieras English",
+                               measure = "lr")
+
+    textplot_keyness(result, n = 20) +
+      labs(
+        title = "Keyness: Data Center Coverage",
+        subtitle = "Target: CE Noticias Financieras English  |  Reference: The New York Times  |\nStatistic: Log-Likelihood (G²)"
+      )
+    ```
+
+    ANSWER HERE.
 
 3.  **Bigrams:** Use `unnest_tokens(token = "ngrams", n = 2)` to extract bigrams. What are the 20 most frequent bigrams? Do they reveal entities or conceptual phrases that single-token analysis misses?
 
-    *Your answer here*
+    Most of the common bigrams are function words with little or no independent meaning on their own, such as 'of the' and 'in the'. The most conceptual phrase is 'data center(s)'. Therefore, the 20 most common bigrams do not reveal anything important in this study. 
 
     ```{r bigrams}
+    # Get the top 20 most frequen
+    df %>%
+      unnest_tokens(bigram, text, token = "ngrams", n = 2) %>%
+      count(bigram, sort = TRUE) %>%
+      slice_head(n = 20)
 
     ```
 
-------------------------------------------------------------------------

@@ -1,0 +1,908 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Lab3-hw3},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Lab3-hw3}
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+\maketitle
+
+\subsection{Overview}\label{overview}
+
+In this lab we'll collect posts from Bluesky Social using the
+\texttt{\{atrrr\}} package and apply lexicon-based sentiment analysis
+tools --- the same tools we covered in lecture (VADER via
+\texttt{\{vader\}}, \texttt{\{sentimentr\}}, and \texttt{\{tidytext\}}
+lexicons). By the end you'll have a working pipeline from API call to
+sentiment scores, and you'll have a concrete sense of where these tools
+succeed and where they fall short. We'll walk through some of this in
+class with sample data, then you'll be responsible for completing it
+with your own data set for the assignment.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{Setup}\label{setup}
+
+\subsubsection{1. Create a Bluesky account and app password (you'll do
+this your
+assignment)}\label{create-a-bluesky-account-and-app-password-youll-do-this-your-assignment}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Add bluesky account information/ credientials in to the \textasciigrave{}.Renviron\textasciigrave{}}
+\CommentTok{\# usethis::edit\_r\_environ() }
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{2.Packages}\label{packages}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#install.packages(c("atrrr", "tidyverse", "tidytext", "sentimentr", "remotes", "textdata"))}
+
+\CommentTok{\# tidyvader isn\textquotesingle{}t on CRAN:}
+\CommentTok{\#install.packages("devtools")}
+\CommentTok{\#devtools::install\_github("chris31415926535/tidyvader")}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(atrrr)}
+\FunctionTok{library}\NormalTok{(tidyverse)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: package 'ggplot2' was built under R version 4.5.2
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'tibble' was built under R version 4.5.2
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'tidyr' was built under R version 4.5.2
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'readr' was built under R version 4.5.2
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'purrr' was built under R version 4.5.2
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'dplyr' was built under R version 4.5.2
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: package 'lubridate' was built under R version 4.5.2
+\end{verbatim}
+
+\begin{verbatim}
+## -- Attaching core tidyverse packages ------------------------ tidyverse 2.0.0 --
+## v dplyr     1.2.1     v readr     2.1.6
+## v forcats   1.0.1     v stringr   1.6.0
+## v ggplot2   4.0.2     v tibble    3.3.1
+## v lubridate 1.9.5     v tidyr     1.3.2
+## v purrr     1.2.1     
+## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()
+## i Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(tidytext)}
+\FunctionTok{library}\NormalTok{(sentimentr)}
+\FunctionTok{library}\NormalTok{(remotes)}
+\FunctionTok{library}\NormalTok{(textdata)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{Part 1: Authenticate and Pull
+Posts}\label{part-1-authenticate-and-pull-posts}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Authenticate}
+\CommentTok{\# Catches token so wont\textquotesingle{}t get hit login rate limits }
+\CommentTok{\# auth(}
+\CommentTok{\#   user = Sys.getenv("BSKY\_USER"),}
+\CommentTok{\#   pass = Sys.getenv("BSKY\_PASS")}
+\CommentTok{\#   ) }
+
+\CommentTok{\# Input the term and limit }
+\NormalTok{raw\_posts }\OtherTok{\textless{}{-}} \FunctionTok{search\_post}\NormalTok{(}\StringTok{"ecosystem service"}\NormalTok{, }\AttributeTok{limit =} \DecValTok{1000}\NormalTok{) }\CommentTok{\#you\textquotesingle{}ll do this later}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## i Found an *unknown total* of posts that fit the query
+\end{verbatim}
+
+\begin{verbatim}
+## \ Got 100 posts, but there is more.. [742ms]| Got 199 posts, but there is more.. [1s]   / Got 298 posts, but there is more.. [1.3s]- Got 396 posts, but there is more.. [1.5s]\ Got 494 posts, but there is more.. [1.8s]| Got 593 posts, but there is more.. [2.1s]/ Got 688 posts, but there is more.. [2.3s]- Got 786 posts, but there is more.. [2.6s]\ Got 879 posts, but there is more.. [2.8s]| Got 974 posts, but there is more.. [3s]  / Got 1067 posts, but there is more.. [3.2s]                                             i Parsing 1067 results.v Got 1067 results. All done!
+\end{verbatim}
+
+Investigate results!
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{glimpse}\NormalTok{(raw\_posts)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Rows: 1,067
+## Columns: 21
+## $ uri           <chr> "at://did:plc:xhrtfphu4gzqrztkpb3a63qf/app.bsky.feed.pos~
+## $ cid           <chr> "bafyreibgbupaqkpf2h2dgavbirplszltiok7l7l5phenpd5zorvyon~
+## $ author_handle <chr> "babygoldie.bsky.social", "rwatimes.bsky.social", "maryp~
+## $ author_name   <chr> "News by babygoldie", "RWATimes.io", "Mary Branscombe", ~
+## $ text          <chr> "[4/5] service capabilities of intermediaries. Promoting~
+## $ author_data   <list> ["did:plc:xhrtfphu4gzqrztkpb3a63qf", "babygoldie.bsky.s~
+## $ post_data     <list> ["app.bsky.feed.post", "2026-04-29T02:41:15.447303+00:0~
+## $ embed_data    <list> <NULL>, <NULL>, <NULL>, <NULL>, <NULL>, <NULL>, <NULL>,~
+## $ reply_count   <int> 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1,~
+## $ repost_count  <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,~
+## $ like_count    <int> 0, 0, 1, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0,~
+## $ quote_count   <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,~
+## $ indexed_at    <dttm> 2026-04-29 02:41:15, 2026-04-28 18:42:12, 2026-04-28 18~
+## $ in_reply_to   <chr> "at://did:plc:xhrtfphu4gzqrztkpb3a63qf/app.bsky.feed.pos~
+## $ in_reply_root <chr> "at://did:plc:xhrtfphu4gzqrztkpb3a63qf/app.bsky.feed.pos~
+## $ quotes        <chr> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ~
+## $ tags          <list> <NULL>, <NULL>, <NULL>, <NULL>, <NULL>, <NULL>, <NULL>,~
+## $ mentions      <list> <NULL>, <NULL>, <NULL>, <NULL>, <NULL>, <NULL>, <NULL>,~
+## $ links         <list> <NULL>, <NULL>, <NULL>, <NULL>, <NULL>, <NULL>, <NULL>,~
+## $ langs         <list> ["en"], <NULL>, ["en"], ["en"], ["en"], ["en"], ["en"],~
+## $ labels        <list> [], [], [], [], [], [], [], [], [], [], [], [], [], [],~
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{head}\NormalTok{(raw\_posts)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 6 x 21
+##   uri            cid   author_handle author_name text  author_data  post_data   
+##   <chr>          <chr> <chr>         <chr>       <chr> <list>       <list>      
+## 1 at://did:plc:~ bafy~ babygoldie.b~ News by ba~ [4/5~ <named list> <named list>
+## 2 at://did:plc:~ bafy~ rwatimes.bsk~ RWATimes.io ➤ Th~ <named list> <named list>
+## 3 at://did:plc:~ bafy~ marypcbuk.bs~ Mary Brans~ so y~ <named list> <named list>
+## 4 at://did:plc:~ bafy~ latticeminds~ Lattice Mi~ Fore~ <named list> <named list>
+## 5 at://did:plc:~ bafy~ babygoldie.b~ News by ba~ [5/8~ <named list> <named list>
+## 6 at://did:plc:~ bafy~ babygoldie.b~ News by ba~ [6/6~ <named list> <named list>
+## # i 14 more variables: embed_data <list>, reply_count <int>,
+## #   repost_count <int>, like_count <int>, quote_count <int>, indexed_at <dttm>,
+## #   in_reply_to <chr>, in_reply_root <chr>, quotes <chr>, tags <list>,
+## #   mentions <list>, links <list>, langs <list>, labels <list>
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{Part 2: Clean and Prepare
+Text}\label{part-2-clean-and-prepare-text}
+
+Pull out necessary columns \& basic cleaning
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{posts }\OtherTok{\textless{}{-}}\NormalTok{ raw\_posts }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{select}\NormalTok{(uri, indexed\_at, text, like\_count, reply\_count, repost\_count) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{indexed\_at =} \FunctionTok{as.POSIXct}\NormalTok{(indexed\_at), }\CommentTok{\# who can tell me how to }
+    \AttributeTok{post\_date  =} \FunctionTok{as.Date}\NormalTok{(indexed\_at),}
+    \AttributeTok{text\_clean =} \FunctionTok{str\_remove\_all}\NormalTok{(text, }\StringTok{"https?}\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{S+"}\NormalTok{), }\CommentTok{\# remove URLs}
+    \AttributeTok{text\_clean =} \FunctionTok{str\_remove\_all}\NormalTok{(text\_clean, }\StringTok{"@}\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{S+"}\NormalTok{),}\CommentTok{\# remove mentions}
+    \AttributeTok{text\_clean =} \FunctionTok{str\_replace\_all}\NormalTok{(text\_clean, }\StringTok{"\textbackslash{}u2019"}\NormalTok{, }\StringTok{"\textquotesingle{}"}\NormalTok{), }\CommentTok{\# normalize all curly \textquotesingle{} to R\textquotesingle{}s \textquotesingle{}}
+    \AttributeTok{text\_clean =} \FunctionTok{str\_remove\_all}\NormalTok{(text\_clean, }\StringTok{"\textquotesingle{}s}\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{b"}\NormalTok{), }\CommentTok{\# remove possessives}
+    \AttributeTok{text\_clean =} \FunctionTok{str\_squish}\NormalTok{(text\_clean) }\CommentTok{\# cleans all the added white space }
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(}\FunctionTok{nchar}\NormalTok{(text\_clean) }\SpecialCharTok{\textgreater{}} \DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Number of posts:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{nrow}\NormalTok{(posts) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1060
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{Part 3: Word Frequency}\label{part-3-word-frequency}
+
+Explore and plot more frequent words used
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Standard stop words}
+\FunctionTok{data}\NormalTok{(}\StringTok{"stop\_words"}\NormalTok{)}
+
+\NormalTok{tokens\_clean }\OtherTok{\textless{}{-}}\NormalTok{ posts }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{unnest\_tokens}\NormalTok{(word, text\_clean) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{anti\_join}\NormalTok{(stop\_words, }\AttributeTok{by =} \StringTok{"word"}\NormalTok{)}
+
+\CommentTok{\# Custom stop words }
+\NormalTok{custom\_sw }\OtherTok{\textless{}{-}} \FunctionTok{tibble}\NormalTok{(}\AttributeTok{word =} \FunctionTok{c}\NormalTok{(}
+  \CommentTok{\# search terms}
+  \StringTok{"ecosystem"}\NormalTok{, }\StringTok{"service"}
+  \CommentTok{\# other common but uninformative text }
+  \CommentTok{\# I can\textquotesingle{}t think of anything}
+\NormalTok{))}
+
+\NormalTok{tokens\_clean2 }\OtherTok{\textless{}{-}}\NormalTok{ tokens\_clean }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{anti\_join}\NormalTok{(custom\_sw, }\AttributeTok{by =} \StringTok{"word"}\NormalTok{)}
+
+\CommentTok{\# Word frequency plot}
+
+\NormalTok{word\_counts }\OtherTok{\textless{}{-}}\NormalTok{ tokens\_clean2 }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{count}\NormalTok{(word, }\AttributeTok{sort =} \ConstantTok{TRUE}\NormalTok{)}
+
+\NormalTok{word\_counts }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{slice\_max}\NormalTok{(n, }\AttributeTok{n =}\DecValTok{20}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \FunctionTok{reorder}\NormalTok{(word, n), }\AttributeTok{y =}\NormalTok{ n)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_col}\NormalTok{(}\AttributeTok{fill =} \StringTok{"\#6c91c9"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{coord\_flip}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"top 20 words in Blue Sky \textquotesingle{}Ecosystem Service\textquotesingle{} posts"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{theme\_minimal}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Lab3-hw3_files/Lab3-hw3_files/figure-latex/word-freq-1.pdf}}
+
+\subsection{Part 4: Sentiment Analysis}\label{part-4-sentiment-analysis}
+
+\begin{quote}
+\textbf{Note:} If you need to re-run any chunk in this section, run
+\texttt{rm(posts)} in the console first and re-run from Part 2. This
+avoids duplicate column errors.
+\end{quote}
+
+\subsubsection{4a. Bing lexicon
+(word-level)}\label{a.-bing-lexicon-word-level}
+
+The Bing lexicon is a polarity / binary lexicon grouping where yes/no =
+positive/negative. It is a list of words and their positive or negative
+sentiments.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Load lexicon }
+\NormalTok{bing\_lexicon }\OtherTok{\textless{}{-}} \FunctionTok{get\_sentiments}\NormalTok{(}\StringTok{"bing"}\NormalTok{)}
+\CommentTok{\#get\_sentiments("bing")}
+\end{Highlighting}
+\end{Shaded}
+
+Join the bing lexicon list to the tokenized the posts and calcultae the
+net score (positive word count minus negative word count) per post.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Score posts with Bing}
+\NormalTok{bing\_scores }\OtherTok{\textless{}{-}}\NormalTok{ posts }\SpecialCharTok{\%\textgreater{}\%} 
+  \CommentTok{\# Tokenize posts }
+  \FunctionTok{unnest\_tokens}\NormalTok{(word, text\_clean) }\SpecialCharTok{\%\textgreater{}\%} 
+  \CommentTok{\# Join the words to the sentiment lexicon }
+  \FunctionTok{inner\_join}\NormalTok{(bing\_lexicon, }\AttributeTok{by =} \StringTok{"word"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{count}\NormalTok{(uri, sentiment) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{pivot\_wider}\NormalTok{(}\AttributeTok{names\_from =}\NormalTok{ sentiment, }
+              \AttributeTok{values\_from =}\NormalTok{ n, }
+              \AttributeTok{values\_fill =} \DecValTok{0}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \CommentTok{\# Calculate total sentiment score: positives {-} negative }
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{score\_b =}\NormalTok{ positive }\SpecialCharTok{{-}}\NormalTok{ negative) }
+\end{Highlighting}
+\end{Shaded}
+
+Join the scores back onto \texttt{posts}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Join scores to posts  }
+\NormalTok{posts }\OtherTok{\textless{}{-}}\NormalTok{ posts }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{left\_join}\NormalTok{(bing\_scores, }\StringTok{"uri"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{bing\_score =} \FunctionTok{replace\_na}\NormalTok{(score\_b, }\DecValTok{0}\NormalTok{)) }\CommentTok{\# NA scores = 0 }
+
+\CommentTok{\# Check if it joined the score column }
+\CommentTok{\# colnames(posts)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{4b. AFINN lexicon (numeric
+scores)}\label{b.-afinn-lexicon-numeric-scores}
+
+Score the posts with the afinn sentiment package where each word carries
+an integer value (−5 to +5).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# You will be prompted to download the AFINN lexicon the first time —}
+\CommentTok{\# run this line in the console and select Yes, then it will be cached locally}
+\NormalTok{afinn }\OtherTok{\textless{}{-}} \FunctionTok{get\_sentiments}\NormalTok{(}\StringTok{"afinn"}\NormalTok{)}
+
+\CommentTok{\# Score text}
+\NormalTok{afinn\_scores }\OtherTok{\textless{}{-}}\NormalTok{ posts }\SpecialCharTok{\%\textgreater{}\%}
+  \CommentTok{\# Tokenize posts }
+  \FunctionTok{unnest\_tokens}\NormalTok{(word, text\_clean) }\SpecialCharTok{\%\textgreater{}\%} 
+  \CommentTok{\# Inner Join the words to the sentiment lexicon  }
+  \FunctionTok{inner\_join}\NormalTok{(afinn, }\AttributeTok{by =} \StringTok{"word"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \CommentTok{\# Score: sum of afinn scores for each URI }
+  \FunctionTok{group\_by}\NormalTok{(uri) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{score\_af =} \FunctionTok{sum}\NormalTok{(value), }\AttributeTok{.groups =} \StringTok{"drop"}\NormalTok{)}
+
+
+\CommentTok{\# Join scores to posts  }
+\NormalTok{posts }\OtherTok{\textless{}{-}}\NormalTok{ posts }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{left\_join}\NormalTok{(afinn\_scores, }\StringTok{"uri"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{afinn\_score =} \FunctionTok{replace\_na}\NormalTok{(score\_af, }\DecValTok{0}\NormalTok{)) }\CommentTok{\# NA scores = 0 }
+
+\CommentTok{\# str(posts) \# Checking dataset }
+\end{Highlighting}
+\end{Shaded}
+
+Clean the dataset before moving on
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{posts }\OtherTok{\textless{}{-}}\NormalTok{ posts }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{select}\NormalTok{(}\SpecialCharTok{{-}}\FunctionTok{c}\NormalTok{(negative, positive, score\_b, score\_af))}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{4c. NRC lexicon (emotion
+categories)}\label{c.-nrc-lexicon-emotion-categories}
+
+The NRC lexicon tags words with 8 emotions (anger, fear, anticipation,
+trust, surprise, sadness, joy, disgust) plus positive/negative.
+
+Now, count emotion words per post and visualize which emotions dominate
+the corpus.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{nrc }\OtherTok{\textless{}{-}} \FunctionTok{get\_sentiments}\NormalTok{(}\StringTok{"nrc"}\NormalTok{)}
+
+\CommentTok{\# Score text {-} Count emotion words per post}
+\NormalTok{nrc\_scores }\OtherTok{\textless{}{-}}\NormalTok{ posts }\SpecialCharTok{\%\textgreater{}\%} 
+  \CommentTok{\# Tokenized posts }
+  \FunctionTok{unnest\_tokens}\NormalTok{(word, text\_clean) }\SpecialCharTok{\%\textgreater{}\%} 
+  \CommentTok{\# Join to NRC }
+  \FunctionTok{inner\_join}\NormalTok{(nrc, }\AttributeTok{by =} \StringTok{"word"}\NormalTok{, }\AttributeTok{relationship =} \StringTok{"many{-}to{-}many"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \CommentTok{\# Count emotion words per post }
+  \FunctionTok{group\_by}\NormalTok{(uri, sentiment) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{nrc\_count =} \FunctionTok{n}\NormalTok{(), }\AttributeTok{.groups =} \StringTok{"drop"}\NormalTok{) }
+
+
+\CommentTok{\# Visualize which emotions dominate the corpus}
+\NormalTok{nrc\_scores }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(sentiment) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{nrc\_count =} \FunctionTok{sum}\NormalTok{(nrc\_count), }\AttributeTok{.groups =} \StringTok{\textquotesingle{}drop\textquotesingle{}}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{ggplot}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{geom\_col}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =} \FunctionTok{reorder}\NormalTok{(sentiment, nrc\_count), }\AttributeTok{x =}\NormalTok{ nrc\_count), }
+           \AttributeTok{fill =} \StringTok{"\#e14225"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Emotion Words in Search"}\NormalTok{, }\AttributeTok{x =} \StringTok{"Count"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Sentiment Words"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Lab3-hw3_files/Lab3-hw3_files/figure-latex/nrc-1.pdf}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Join to post}
+\NormalTok{posts }\OtherTok{\textless{}{-}}\NormalTok{ posts }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{left\_join}\NormalTok{(nrc\_scores, }\AttributeTok{by =} \StringTok{"uri"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{rename}\NormalTok{(}\AttributeTok{nrc\_sentiment\_words =}\NormalTok{ sentiment)}
+\end{Highlighting}
+\end{Shaded}
+
+Which emotions dominate the corpus? Plot the count of total scored words
+for each of the 8 emotions.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{nrc\_scores }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(sentiment) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{nrc\_count =} \FunctionTok{sum}\NormalTok{(nrc\_count)) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{filter}\NormalTok{(}\SpecialCharTok{!}\NormalTok{sentiment }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"positive"}\NormalTok{, }\StringTok{"negative"}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%} \CommentTok{\# Remove positive and negative }
+  \FunctionTok{ggplot}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{geom\_col}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =} \FunctionTok{reorder}\NormalTok{(sentiment, nrc\_count), }\AttributeTok{x =}\NormalTok{ nrc\_count), }\AttributeTok{fill =} \StringTok{"goldenrod"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Count of Emotion Words in Search"}\NormalTok{, }\AttributeTok{x =} \StringTok{"Count"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Sentiment Words"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Lab3-hw3_files/Lab3-hw3_files/figure-latex/nrc-plot-1.pdf}}
+
+What words are driving each emotion? Create plots of the top 10 words
+for each emotion (hint: ggplot and
+\texttt{facet\_wrap(\textasciitilde{}sentiment)}).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Find frequency of words for each sentiment }
+\NormalTok{sentiment\_word\_count }\OtherTok{\textless{}{-}}\NormalTok{ posts }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{unnest\_tokens}\NormalTok{(word, text\_clean) }\SpecialCharTok{\%\textgreater{}\%} \CommentTok{\# Tokenized posts}
+  \FunctionTok{inner\_join}\NormalTok{(nrc, }\AttributeTok{by =} \StringTok{"word"}\NormalTok{, }\AttributeTok{relationship =} \StringTok{"many{-}to{-}many"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \CommentTok{\# Join to NRC }
+  \FunctionTok{count}\NormalTok{(sentiment, word, }\AttributeTok{sort =} \ConstantTok{TRUE}\NormalTok{)  }\CommentTok{\# Count of words per sentiment }
+
+\CommentTok{\# Get the top 10 most frequent words for each sentiment group }
+\NormalTok{top\_10 }\OtherTok{\textless{}{-}}\NormalTok{ sentiment\_word\_count }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{group\_by}\NormalTok{(sentiment) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{slice\_max}\NormalTok{(}\AttributeTok{order\_by =}\NormalTok{ n, }\AttributeTok{n =} \DecValTok{10}\NormalTok{, }\AttributeTok{with\_ties =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{ungroup}\NormalTok{()}
+
+\CommentTok{\# Plot the top 10 words for each sentiment group }
+\FunctionTok{ggplot}\NormalTok{(top\_10, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \FunctionTok{reorder\_within}\NormalTok{(word, n, sentiment), }\AttributeTok{y =}\NormalTok{ n, }\AttributeTok{fill =}\NormalTok{ sentiment)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_col}\NormalTok{(}\AttributeTok{show.legend =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{scale\_x\_reordered}\NormalTok{() }\SpecialCharTok{+}  \CommentTok{\# Keeps ordering within facets}
+  \FunctionTok{facet\_wrap}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{ sentiment, }\AttributeTok{scales =} \StringTok{"free\_y"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{title =} \StringTok{"Top 10 Words per Sentiment Group"}\NormalTok{,}
+    \AttributeTok{x =} \StringTok{"Word"}\NormalTok{,}
+    \AttributeTok{y =} \StringTok{"Frequency"}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{coord\_flip}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{theme\_minimal}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Lab3-hw3_files/Lab3-hw3_files/figure-latex/nrc-top-words-1.pdf}}
+
+\subsubsection{4d. sentimentr
+(sentence-aware)}\label{d.-sentimentr-sentence-aware}
+
+Unlike the word-level lexicons above, \texttt{\{sentimentr\}} scores at
+the sentence level and handles valence shifters like negation --- ``not
+alarming'' won't score the same as ``alarming.'' Pass the full
+\texttt{text\_clean} vector to \texttt{sentiment\_by()}. Rename the
+resulting \texttt{ave\_sentiment} to \texttt{sr\_scores} and join back
+onto \texttt{posts} by row index. I'll give you this code as we haven't
+fully covered this yet.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Using sentimentr }
+\NormalTok{sr\_scores }\OtherTok{\textless{}{-}} \FunctionTok{sentiment\_by}\NormalTok{(posts}\SpecialCharTok{$}\NormalTok{text\_clean) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{select}\NormalTok{(element\_id, ave\_sentiment) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{rename}\NormalTok{(}\AttributeTok{sr\_score =}\NormalTok{ ave\_sentiment) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{element\_id =} \FunctionTok{as.integer}\NormalTok{(element\_id))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Each time `sentiment_by` is run it has to do sentence boundary disambiguation when a
+## raw `character` vector is passed to `text.var`. This may be costly of time and
+## memory.  It is highly recommended that the user first runs the raw `character`
+## vector through the `get_sentences` function.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Join sr score back into posts by row index }
+\NormalTok{posts }\OtherTok{\textless{}{-}}\NormalTok{ posts }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{element\_id =} \FunctionTok{row\_number}\NormalTok{()) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{left\_join}\NormalTok{(sr\_scores, }\AttributeTok{by =} \StringTok{"element\_id"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{4e. VADER}\label{e.-vader}
+
+VADER scores the full post text (no tokenization needed) and returns
+four values: \texttt{pos}, \texttt{neu}, \texttt{neg}, and
+\texttt{compound}. Use \texttt{tidyvader::vader()} on the
+\texttt{text\_clean} column --- it mutates the result directly onto the
+dataframe. Keep only the \texttt{compound} score and drop the component
+columns.
+
+Let's run VADER on a single post manually before applying it to the
+whole dataset:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# look at a few posts}
+\NormalTok{posts }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{select}\NormalTok{(text\_clean) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{slice}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 10 x 1
+##    text_clean                                                                   
+##    <chr>                                                                        
+##  1 [4/5] service capabilities of intermediaries. Promoting the high-quality dev~
+##  2 [4/5] service capabilities of intermediaries. Promoting the high-quality dev~
+##  3 [4/5] service capabilities of intermediaries. Promoting the high-quality dev~
+##  4 [4/5] service capabilities of intermediaries. Promoting the high-quality dev~
+##  5 [4/5] service capabilities of intermediaries. Promoting the high-quality dev~
+##  6 ➤ The card integrates with Tether digital wallet, expanding its ecosystem in~
+##  7 ➤ The card integrates with Tether digital wallet, expanding its ecosystem in~
+##  8 ➤ The card integrates with Tether digital wallet, expanding its ecosystem in~
+##  9 so you've got the direct impact on what people buy through and from Amazon a~
+## 10 so you've got the direct impact on what people buy through and from Amazon a~
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# run VADER on one post — swap in whichever row looks interesting to you}
+\NormalTok{posts}\SpecialCharTok{$}\NormalTok{text\_clean[}\DecValTok{3}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "[4/5] service capabilities of intermediaries. Promoting the high-quality development of listed companies is a systematic project. All regions and departments must take the initiative to optimize the business environment, jointly create a good ecosystem that supports the high-quality"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{tidyvader}\SpecialCharTok{::}\FunctionTok{vader\_chr}\NormalTok{(posts}\SpecialCharTok{$}\NormalTok{text\_clean[}\DecValTok{3}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   compound    pos    neu neg
+## 1   0.9042 0.2857 0.7143   0
+\end{verbatim}
+
+What did VADER catch? What did it miss? How does the compound score
+relate to the word-level scores?
+
+VADAR determined the whole text was neutral (neu = 1), which makes sense
+as the sentence is a factual, descriptive statement with no emotional
+language.
+
+\subsection{\texorpdfstring{Now score all the posts with VADER. Rename
+it's default scoring column to
+\texttt{vader\_score}.}{Now score all the posts with VADER. Rename it's default scoring column to vader\_score.}}\label{now-score-all-the-posts-with-vader.-rename-its-default-scoring-column-to-vader_score.}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{posts }\OtherTok{\textless{}{-}}\NormalTok{ posts }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{vader\_score =}\NormalTok{ purrr}\SpecialCharTok{::}\FunctionTok{map\_dbl}\NormalTok{(text\_clean, }\SpecialCharTok{\textasciitilde{}}\NormalTok{ tidyvader}\SpecialCharTok{::}\FunctionTok{vader\_chr}\NormalTok{(.x)}\SpecialCharTok{$}\NormalTok{compound))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{Part 5: Compare the
+Methods}\label{part-5-compare-the-methods}
+
+\subsubsection{Correlations}\label{correlations}
+
+Let's see to what extent the 4 numerical methods (bing, afinn, sr, and
+vader) are in agreement. Select the 4 scores and use \texttt{cor()}
+using ``complete.obs''.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{posts }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{select}\NormalTok{(bing\_score, afinn\_score, sr\_score, vader\_score) }\SpecialCharTok{\%\textgreater{}\%} \CommentTok{\# Select 4 scores }
+  \FunctionTok{cor}\NormalTok{(}\AttributeTok{use =} \StringTok{"complete.obs"}\NormalTok{) }\CommentTok{\# use cor()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##             bing_score afinn_score  sr_score vader_score
+## bing_score   1.0000000   0.6931579 0.6006261   0.6634219
+## afinn_score  0.6931579   1.0000000 0.5079764   0.7735428
+## sr_score     0.6006261   0.5079764 1.0000000   0.5563381
+## vader_score  0.6634219   0.7735428 0.5563381   1.0000000
+\end{verbatim}
+
+\subsubsection{Score distributions}\label{score-distributions}
+
+Use \texttt{pivot\_longer()} to reshape the four score columns into a
+single \texttt{score} column with a \texttt{method} identifier, then
+plot with \texttt{geom\_histogram()} and \texttt{facet\_wrap()}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{posts }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{pivot\_longer}\NormalTok{(}\AttributeTok{cols =} \FunctionTok{c}\NormalTok{(bing\_score, afinn\_score, sr\_score, vader\_score), }
+               \AttributeTok{names\_to =} \StringTok{"method"}\NormalTok{, }
+               \AttributeTok{values\_to =} \StringTok{"scores"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{ggplot}\NormalTok{() }\SpecialCharTok{+} 
+  \FunctionTok{geom\_histogram}\NormalTok{(}\FunctionTok{aes}\NormalTok{(scores, }\AttributeTok{fill =}\NormalTok{ method), }\AttributeTok{show.legend =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{facet\_wrap}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{method) }\SpecialCharTok{+} 
+  \FunctionTok{theme\_bw}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `stat_bin()` using `bins = 30`. Pick better value `binwidth`.
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Lab3-hw3_files/Lab3-hw3_files/figure-latex/distributions-1.pdf}}
+
+\textbf{Question 1:} Do the four methods broadly agree or disagree?
+Where do you see the biggest differences in the distributions? Which
+method produces the most zeros, and why?
+
+All four methods show a neutral corpus.
+
+The VADAR and sentimentr results are similar. Their scores are very
+neutral, having high counts at/around 0. These are both sentence-level
+analyzers that account for context. These methods are more precise but
+more conservative as they miss sentiment that is not explicitly
+emotional. The accumulated text does not contain strong language, so
+VADAR and sentimentr scores are concentrated at 0.
+
+Unlike VADAR and sentimentr, the bing and afinn scores both have a large
+score range and broader distributions. Bing and afinn are word-count
+based so they accumulate scores across a document, resulting in more
+variations across posts.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{Part 6: Spot-Check for
+Misclassification}\label{part-6-spot-check-for-misclassification}
+
+Find posts where the methods disagree most --- these are the best
+candidates for understanding failure modes. Use \texttt{mutate()} to
+create binary flags from the continuous scores, then \texttt{filter()}
+for posts where the two methods point in opposite directions.
+
+Finding where bing and VADAD scores point opposite directions.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{misclassifications }\OtherTok{\textless{}{-}}\NormalTok{ posts }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{select}\NormalTok{(}\FunctionTok{c}\NormalTok{(text\_clean, bing\_score, vader\_score)) }\SpecialCharTok{\%\textgreater{}\%} 
+  \CommentTok{\# New column with score signs }
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{bing\_flag =} \FunctionTok{sign}\NormalTok{(bing\_score),}
+         \CommentTok{\#afinn\_flag = sign(afinn\_score),}
+         \CommentTok{\#sr\_flag = sign(sr\_score),}
+         \AttributeTok{vadar\_flag =} \FunctionTok{sign}\NormalTok{(vader\_score)}
+\NormalTok{         ) }\SpecialCharTok{\%\textgreater{}\%} 
+  \CommentTok{\# Filter for posts where two methods point in opposite directions }
+  \CommentTok{\# Picking bing and VADAR }
+  \FunctionTok{filter}\NormalTok{((bing\_flag }\SpecialCharTok{==} \SpecialCharTok{{-}}\DecValTok{1} \SpecialCharTok{\&}\NormalTok{ vadar\_flag }\SpecialCharTok{==} \DecValTok{1}\NormalTok{) }\SpecialCharTok{|} 
+\NormalTok{         (bing\_flag }\SpecialCharTok{==} \DecValTok{1} \SpecialCharTok{\&}\NormalTok{ vadar\_flag }\SpecialCharTok{==} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{))}
+
+\FunctionTok{head}\NormalTok{(misclassifications)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 6 x 5
+##   text_clean                         bing_score vader_score bing_flag vadar_flag
+##   <chr>                                   <int>       <dbl>     <dbl>      <dbl>
+## 1 I'm not sure it makes up losses l~          1      -0.287         1         -1
+## 2 I'm not sure it makes up losses l~          1      -0.287         1         -1
+## 3 I'm not sure it makes up losses l~          1      -0.287         1         -1
+## 4 Basically use Gamepass as a promo~         -1       0.226        -1          1
+## 5 Basically use Gamepass as a promo~         -1       0.226        -1          1
+## 6 Basically use Gamepass as a promo~         -1       0.226        -1          1
+\end{verbatim}
+
+To rank posts by total disagreement, compute the absolute difference
+between the two scores with \texttt{abs()}, then
+\texttt{arrange(desc(...))} to surface the highest-conflict posts.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{high\_conflict\_text }\OtherTok{\textless{}{-}}\NormalTok{ posts }\SpecialCharTok{\%\textgreater{}\%} 
+  \CommentTok{\# Text per row and keep only neccessary columns  }
+  \FunctionTok{select}\NormalTok{(}\FunctionTok{c}\NormalTok{(text\_clean, bing\_score, vader\_score)) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{group\_by}\NormalTok{(text\_clean) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{bing\_score =} \FunctionTok{mean}\NormalTok{(bing\_score), }
+            \AttributeTok{vader\_score =} \FunctionTok{mean}\NormalTok{(vader\_score)) }\SpecialCharTok{\%\textgreater{}\%} 
+  \CommentTok{\# New column with score signs }
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{bing\_flag =} \FunctionTok{sign}\NormalTok{(bing\_score),}
+         \CommentTok{\#afinn\_flag = sign(afinn\_score),}
+         \CommentTok{\#sr\_flag = sign(sr\_score),}
+         \AttributeTok{vadar\_flag =} \FunctionTok{sign}\NormalTok{(vader\_score)}
+\NormalTok{         ) }\SpecialCharTok{\%\textgreater{}\%} 
+  \CommentTok{\# Filter for posts where two methods point in opposite directions }
+  \CommentTok{\# Picking bing and VADAR }
+  \FunctionTok{filter}\NormalTok{((bing\_flag }\SpecialCharTok{==} \SpecialCharTok{{-}}\DecValTok{1} \SpecialCharTok{\&}\NormalTok{ vadar\_flag }\SpecialCharTok{==} \DecValTok{1}\NormalTok{) }\SpecialCharTok{|} 
+\NormalTok{         (bing\_flag }\SpecialCharTok{==} \DecValTok{1} \SpecialCharTok{\&}\NormalTok{ vadar\_flag }\SpecialCharTok{==} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%} 
+  \CommentTok{\# Compute the absolute difference between the two scores }
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{abs\_difference =} \FunctionTok{abs}\NormalTok{(bing\_score) }\SpecialCharTok{{-}} \FunctionTok{abs}\NormalTok{(vader\_score)) }\SpecialCharTok{\%\textgreater{}\%} 
+  \CommentTok{\# Arrange for highest{-}conflict first }
+  \FunctionTok{arrange}\NormalTok{(}\FunctionTok{desc}\NormalTok{(abs\_difference))}
+
+\FunctionTok{head}\NormalTok{(high\_conflict\_text)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 6 x 6
+##   text_clean          bing_score vader_score bing_flag vadar_flag abs_difference
+##   <chr>                    <dbl>       <dbl>     <dbl>      <dbl>          <dbl>
+## 1 Its an ecosystem. ~          6     -0.151          1         -1           5.85
+## 2 14) Kosher wedding~          3     -0.0687         1         -1           2.93
+## 3 this suspect n/c i~         -3      0.209         -1          1           2.79
+## 4 Urgent security up~         -3      0.310         -1          1           2.69
+## 5 tanstack.com/ai/la~          3     -0.422          1         -1           2.58
+## 6 Honestly shocked a~         -3      0.643         -1          1           2.36
+\end{verbatim}
+
+\textbf{Question 2:} Read through 5 of the high-conflict posts. For each
+one, write a sentence explaining which method you think is closer to
+correct and why.
+
+\textbf{Row 1}: Bing is closer. The post is frustrated/critical but Bing
+catches the positive framing around the industry. VADER's negative score
+misses that the negativity is directed at policymakers, not the subject.
+
+\textbf{Row 2}: Bing is closer. Mixed sentiment, net positive is
+reasonable. VADER going negative likely triggered on ``shit'' without
+capturing the overall constructive tone.
+
+\textbf{Row 3}: VADER is closer. The post is clearly critical/negative.
+Bing scoring +3 likely matched words like ``proud,'' ``massive,''
+``peacemaker'' without understanding they're used sarcastically or
+negatively.
+
+\textbf{Row 4}: Neither is great, but VADER is wrong. Scoring +0.31 on
+an urgent security warning is clearly off. Bing's -3 at least gets the
+direction right, likely from ``vulnerability,'' ``flaw,'' ``denial.''
+
+\textbf{Row 5}: Bing is closer. The post is promotional/positive. VADER
+scoring -0.42 likely penalized ``no middleman, no fees, no lock-in''
+treating the negations as negative sentiment rather than positive
+selling points.
+
+\subsection{\texorpdfstring{\textbf{Question 3:} Based on everything
+you've run, which method would you choose if you were delivering a
+report onpublic sentiment around your topic, and why? What additional
+steps would you take to validate your
+choice?}{Question 3: Based on everything you've run, which method would you choose if you were delivering a report onpublic sentiment around your topic, and why? What additional steps would you take to validate your choice?}}\label{question-3-based-on-everything-youve-run-which-method-would-you-choose-if-you-were-delivering-a-report-onpublic-sentiment-around-your-topic-and-why-what-additional-steps-would-you-take-to-validate-your-choice}
+
+\subsection{Bonus: Engagement vs.~Sentiment (completion
+optional)}\label{bonus-engagement-vs.-sentiment-completion-optional}
+
+Do more emotionally charged posts get more engagement? Use
+\texttt{abs()} on the VADER compound score to capture emotional
+intensity regardless of direction, apply \texttt{log1p()} to
+\texttt{like\_count} to handle the skewed distribution, and add
+\texttt{geom\_smooth(method\ =\ "lm")} to visualize the trend.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{posts }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{sentiment\_int =} \FunctionTok{abs}\NormalTok{(vader\_score), }\CommentTok{\# Capture emotional intensity }
+    \AttributeTok{likes\_log =} \FunctionTok{log1p}\NormalTok{(like\_count) }\CommentTok{\# Handle skewed distribution}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%} 
+  \CommentTok{\# Plot }
+  \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ sentiment\_int, }\AttributeTok{y =}\NormalTok{ likes\_log)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.3}\NormalTok{, }\AttributeTok{color =} \StringTok{"darkblue"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }\AttributeTok{se =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{color =} \StringTok{"red2"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{title =} \StringTok{"Engagement vs Sentiment Intensity"}\NormalTok{,}
+    \AttributeTok{x =} \StringTok{"Emotional Intensity"}\NormalTok{,}
+    \AttributeTok{y =} \StringTok{"log(1 + likes)"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{theme\_bw}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `geom_smooth()` using formula = 'y ~ x'
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Lab3-hw3_files/Lab3-hw3_files/figure-latex/engagement-1.pdf}}
+
+\textbf{Bonus:} Is there a relationship between sentiment intensity and
+engagement? What does that suggest about what gets amplified on Bluesky?
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\end{document}

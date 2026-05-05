@@ -1,0 +1,36 @@
+---
+title: "lab4"
+format: html
+---
+
+```{r}
+install.packages('LexisNexisTools')
+```
+```{r}
+library(LexisNexisTools)
+library(tidyverse)
+
+pre_files <- list.files(
+  path = here::here("week5", "Nexis", "ocean-acidification"),   # update to your folder
+  pattern = "\\.docx$",
+  full.names = TRUE,
+  recursive = TRUE,
+  ignore.case = TRUE
+)
+
+pre_dat <- lnt_read(pre_files)
+
+pre_meta_df       <- pre_dat@meta
+pre_articles_df   <- pre_dat@articles
+pre_paragraphs_df <- pre_dat@paragraphs
+
+df <- tibble(
+  date     = pre_meta_df$Date,
+  headline = pre_meta_df$Headline,
+  id       = pre_meta_df$ID,
+  text     = pre_articles_df$Article,
+  source   = pre_meta_df$Newspaper
+)
+
+```
+

@@ -1,0 +1,44 @@
+---
+title: "lab4_hw"
+format: html
+---
+
+```{r}
+library(quanteda)
+library(tm)
+library(topicmodels)
+library(topicdoc)   
+library(tidyverse)
+library(tidytext)
+library(reshape2)
+library(tictoc)
+library(LDAvis)
+library(tsne)
+library(servr)
+```
+
+
+## Load in Data 
+
+## Build Corpus 
+
+## Tokenize and Clean 
+
+## Build the Document-Feature Matrix
+
+## Step 1: Initial Model (Theory-Driven k)
+
+### Inspect the Posterior Distributions
+
+## Step 2: Selecting k with Coherence Scores
+
+## Step 3: Fit the Selected Model
+
+## Step 4: Visualize Top Terms per Topic
+
+## Step 5: Name the Topics
+
+## Step 6: Document-Topic Distributions (θ)
+
+## Step 7: Interactive Visualization with LDAvis
+

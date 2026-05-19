@@ -20,7 +20,7 @@ mixture of words. Understanding the key variables helps interpret model
 outputs:
 
 | Symbol | Name | Role |
-|-----------------------------|----------------------|----------------------|
+|----|----|----|
 | **α** (alpha) | Hyperparameter | Dirichlet prior on document-topic distributions. Small α → each document focuses on few topics. Set by researcher. |
 | **β** (beta) | Hyperparameter | Dirichlet prior on topic-word distributions. Small β → each topic uses a focused vocabulary. Set by researcher. |
 | **θ** (theta) | Document-topic distribution | Probability distribution over topics for each document. *P(topic \| document)*. Latent — must be inferred. |

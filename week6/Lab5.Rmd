@@ -159,8 +159,9 @@ Lasso classification uses regularization on regression to produce a simpler, mor
 
 The penalty is a hyperparameter we need to choose. Rather than setting it manually, we estimate its best value by fitting models across 30 candidate penalty values on our resampled data and comparing performance.
 
+Lasso 
 ```{r penalty-tuning-specification}
-tune_spec <- logistic_reg(penalty = tune(), mixture = 1) %>%
+tune_spec <- logistic_reg(penalty = tune(), mixture = 1) %>% # logistic regression (for lasso) - tune the hyper parameter 
   set_mode("classification") %>%
   set_engine("glmnet")
 
@@ -169,11 +170,24 @@ tune_spec
 ```
 
 ```{r lamba}
-lambda_grid <- 
+lambda_grid <- logistic_reg(penalty = tune(), mixture = 1) %>% 
+  set_mode("classification") %>% 
+  set_engine("glmnet") 
 
 lambda_grid
 
 ```
+
+0 = ridge 
+anything invetweenn = elastic net 
+1 = lasso 
+
+```{r}
+lambda_grid <- grid_regular(penalty(), level = 30)  # 30 values for the hyperparameter 
+lambda_grid
+
+```
+
 
 Here we use grid_regular() to create 30 possible values for the regularization penalty. Then tune_grid() fits a model at each of those values.
 

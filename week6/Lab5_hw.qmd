@@ -1,0 +1,147 @@
+---
+title: "Lab5_hw"
+format: html
+author: "Megan Hessel"
+---
+
+## Set up
+
+Load libraries
+
+```{r packages, include = FALSE}
+library(tidytext)
+library(tidyverse)
+library(tidymodels)
+library(textrecipes)
+library(naivebayes)
+library(discrim) 
+library(glmnet)
+```
+
+Load data
+
+```{r}
+urlfile ="https://raw.githubusercontent.com/MaRo406/EDS-231-text-sentiment/main/data/climbing_reports_model_dat.csv"
+incidents_df<-readr::read_csv(url(urlfile))
+```
+
+20/80 test and training split
+
+```{r}
+set.seed(321)
+
+# 2 classes 
+incident2class <- incidents_df %>% 
+  mutate(deadly = factor(if_else(
+    is.na(Deadly), "nondeadly", "deadly"
+  )))
+
+# 20/80 split 
+incidents_split <- rsample::initial_split(incident2class, prop = 0.8, strata = deadly)
+incidents_train <- training(incidents_split)
+incidents_test <- testing(incidents_split)
+
+```
+
+## K-Nearest Neighbor
+
+------------------------------------------------------------------------
+
+\<Identify the key hyperparameter(s) for your chosen algorithm. Briefly explain in plain language what the hyperparameter controls and why tuning it matters.\>
+
+I am running K-nearest neighbor for the incidents data set. The key hyper-parameter for KNN is the number of neighbors (K). KNN predicts the classification for a value based on the classifications of the surrounding values. K represents the number of neighbors that determine how values will be classified. If K is too big, the model is underfitting whereas a small K causes overfitting.
+
+For instance, we are trying to predict a home's income in Houston, TX. If we use all of Harris county to predict the home's income (large K), the prediction will be too broad. If we only use the home's direct neighbor to predict the home's income (small K), the prediction will be bad as gentrification can cause one "nice" home to be neighbors to a lesser-nice home. Therefore, it is important to pick the correct K for the data set.
+
+To pick a good K value, I will tune K using cross validation and select the best hyper parameter for the data set. Then I will fit the final tuned model and evaluate it on the test set and access the accuracy and plot ROC and the confusion matrix.
+
+----
+
+### Tuning Hyper-parameter
+
+Tune at least one hyperparameter using cross-validation and select a final value.
+
+```{r}
+# Penalty-tuning-specification 
+knn_spec <- nearest_neighbor(neighbors = tune(), ) %>% 
+  set_engine("kknn") %>% 
+  set_mode("classification")
+
+# Create Cross-Validation Folds
+cv_folds <- vfold_cv(incidents_train, v = 10, strata = deadly)
+
+# Hyper parameter - K neighbors 
+k_grid <- grid_regular(neighbors(range = c(1, 50)), levels = 20)
+```
+
+```{r}
+# Create a workflow to bundle recipe and model - updated workflow 
+knn_wf <- workflow() %>% 
+  add_recipe(recipe) %>% 
+  add_model(knn_spec)
+
+# TUNE - Fit the model 
+set.seed(321)
+tune_knn <- tune_grid( # tune_grid() fits a model at each of the HP values 
+  knn_wf,
+  cv_folds,
+  grid = k_grid,
+  control = control_resamples(save_pred = T))
+
+# Evaluate & Predictions
+chosen_acc <- tune_knn %>% select_by_one_std_err(metric = "accuracy", neighbors)
+```
+
+### Fit Tuned Model 
+
+Fit your final tuned model and evaluate it on the test set.
+
+```{r}
+# Finalize our workflow with best regularization penalty.
+final_knn  <- finalize_workflow(knn_wf, chosen_acc)
+
+# Fit to the training data.
+fitted_knn <- fit(final_knn, incidents_train)
+
+```
+
+```{r}
+# Fit to the test data 
+last_fit(final_knn, incidents_split) %>%
+  collect_metrics()
+
+# Get Predictions
+predictions <- last_fit(final_knn, incidents_split) %>% 
+  collect_predictions()
+```
+
+### Plots: ROC and Confusion Matrix
+
+Create an ROC plot
+
+```{r}
+# ROC 
+predictions %>%
+  group_by(id) %>%
+  roc_curve(truth = deadly, .pred_deadly) %>%
+  autoplot() +
+  labs(
+    color = "Resamples",
+    title = "ROC curve for Climbing Incident Reports"
+  )
+```
+
+Compare its accuracy and ROC AUC to the Naive Bayes and Lasso models from the demo. Which model performs best, and why do you think that is?
+
+Examine the confusion matrix for your tuned model.
+
+```{r}
+# Confusion Matrix 
+tune_knn %>%
+  conf_mat_resampled(parameters = chosen_acc, # pass the best parameters (AI told me this)
+                     tidy = FALSE) %>%
+  autoplot(type = "heatmap") + 
+  scale_fill_gradient(low = "#f7fbff", high = "#08306b")
+```
+
+What does the confusion matrix tell you about how the model is handling the minority class? Is overall accuracy a good summary metric here? What would you prioritize — minimizing false negatives (missed fatalities) or false positives (false alarms) — and why?

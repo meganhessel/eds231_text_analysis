@@ -38,37 +38,38 @@ recipe <- incidents_rec %>%
   step_tfidf() # token --> multi variable containing term freq inverse doc freq of tokens
 
 # Bundle  everything into a single object
-incidents_wf <- workflow %>% 
-  add_recipe(recipe)
+# incidents_wf <- workflow %>% 
+#   add_recipe(recipe)
 
 # ------------------------------------------------------------------------------
 #                      Naive Bayes Model 
 # ------------------------------------------------------------------------------
 
 # Define the recipe
-incidents_wf <- workflow %>% 
-  add_recipe(recipe)
+# incidents_wf <- workflow %>% 
+#   add_recipe(recipe)
 
 # Define the model specification
 nb_spec <- naive_Bayes() %>%
-  set_mode("classification") %>% 
-  set_engine("naivebayes") 
+  set_mode("classification") %>% #set modeling context
+  set_engine("naivebayes") #method for fitting model
+
 
 # Cross Validation Folds
 set.seed(123)
 incidents_folds <- vfold_cv(incidents_train)
-incidents_folds
+
 
 # Create a workflow to bundle recipe and model - updated workflow 
-nb_wf <- workflow() %>% 
-  add_recipe(recipe) %>% 
-  add_model(nb_spec) 
+nb_wf <- workflow() |> 
+  add_recipe(recipe) |> 
+  add_model(nb_spec)
 
 # Fit the model to the data
 nb_rs <- tune::fit_resamples(
-  nb_wf, # instructions for modeling
-  incidents_folds, 
-  control = control_resamples(save_pred = TRUE) # save predictions of each fold 
+  nb_wf,# instructions for modeling
+  incidents_folds,
+  control = control_resamples(save_pred=TRUE) # save predictions of each fold 
 )
 
 # Evaluate & Predictions

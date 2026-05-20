@@ -43,58 +43,62 @@ recipe <- incidents_rec |>
 # ------------------------------------------------------------------------------
 #                       K Nearest Neighbor 
 # ------------------------------------------------------------------------------
-# Create the Recipe
-knn_recipe <- recipe(deadly ~ ., data = incidents_train) %>%
-  step_normalize(all_numeric_predictors()) 
+# Penalty-tuning-specification 
+knn_spec <- nearest_neighbor(neighbors = tune(), ) %>% 
+  set_engine("kknn") %>% 
+  set_mode("classification")
 
 # Create Cross-Validation Folds
 cv_folds <- vfold_cv(incidents_train, v = 10, strata = deadly)
 
-# Specify the KNN Model
-knn_spec <- nearest_neighbor(neighbors = 5) %>%
-  set_engine("kknn") %>%
-  set_mode("classification")
+# Hyper parameter - K neighbors 
+k_grid <- grid_regular(neighbors(range = c(1, 50)), levels = 20)
 
-# Combine into a workflow
-knn_workflow <- workflow() %>%
-  add_recipe(knn_recipe) %>%
+# Create a workflow to bundle recipe and model - updated workflow 
+knn_wf <- workflow() %>% 
+  add_recipe(recipe) %>% 
   add_model(knn_spec)
 
-# TUNE K using cross-validation
-knn_results <- tune_grid(
-  knn_workflow,
-  resamples = cv_folds,
-  grid = grid_regular(neighbors(range = c(1, 20)), levels = 10)
-)
+# TUNE - Fit the model 
+set.seed(321)
+tune_knn <- tune_grid( # tune_grid() fits a model at each of the HP values 
+  knn_wf,
+  cv_folds,
+  grid = k_grid,
+  control = control_resamples(save_pred = T))
 
-#FINALIZE AND EVALUATE 
-# Select best parameters
-best_knn <- select_best(knn_results, metric = "accuracy")
+# Evaluate & Predictions
+chosen_acc <- tune_knn %>% select_by_one_std_err(metric = "accuracy", neighbors)
 
-# Finalize workflow and fit to the full training set
-final_fit <- knn_workflow %>%
-  finalize_workflow(best_knn) %>%
-  last_fit(incidents_split)
+# Finalize our workflow with best regularization penalty.
+final_knn  <- finalize_workflow(knn_wf, chosen_acc)
 
-# View performance metrics
-collect_metrics(final_fit)
+# Fit to the training data.
+fitted_knn <- fit(final_knn, incidents_train)
 
-# predict with test data 
-predictions <- predict(rf_fit, new_data = incidents_test)
+# Fit to the test data and see how we did.
+last_fit(final_knn, incidents_split) %>%
+  collect_metrics()
 
+predictions <- last_fit(final_knn, incidents_split) %>% 
+  collect_predictions()
 
 # ------------------------------------------------------------------------------
+#                                   ROC AUC
+# ------------------------------------------------------------------------------
+# ROC 
+predictions %>%
+  group_by(id) %>%
+  roc_curve(truth = deadly, .pred_deadly) %>%
+  autoplot() +
+  labs(
+    color = "Resamples",
+    title = "ROC curve for Climbing Incident Reports"
+  )
 
-# Bundle into a Workflow
-knn_workflow <- workflow() %>%
-  add_recipe(knn_recipe) %>%
-  add_model(knn_spec)
-
-# Fit the Model
-knn_fitted <- knn_workflow %>%
-  fit(data = incidents_train)
-
-# Make predictions with test data 
-predictions <- predict(rf_fit, new_data = incidents_test)
-
-
+# Confusion Matrix 
+tune_knn %>%
+  conf_mat_resampled(parameters = chosen_acc, # pass the best parameters (AI told me this)
+                     tidy = FALSE) %>%
+  autoplot(type = "heatmap") + 
+  scale_fill_gradient(low = "#f7fbff", high = "#08306b")

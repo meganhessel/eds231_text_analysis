@@ -44,11 +44,6 @@ incidents_wf <- workflow %>%
 # ------------------------------------------------------------------------------
 #                      Lasso
 # ------------------------------------------------------------------------------
-
-# Define the recipe
-incidents_wf <- workflow %>% 
-  add_recipe(recipe)
-
 # Penalty-tuning-specification 
 tune_spec <- logistic_reg(penalty = tune(), mixture = 1) %>%
   set_mode("classification") %>%

@@ -5,7 +5,7 @@ date: "2026-05-12"
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(eval=FALSE)
+#knitr::opts_chunk$set(eval=FALSE)
 ```
 
 ```{r packages, include = FALSE}
@@ -89,6 +89,7 @@ incidents_folds <- vfold_cv(incidents_train)
 incidents_folds
 
 ```
+
 Create a tidymodels workflow to combine the modeling components
 
 > **Python parallel:** A `workflow()` is the tidymodels equivalent of `sklearn.pipeline.Pipeline`. Both bundle preprocessing and a model estimator into a single object that can be fit, cross-validated, and used for prediction in one call.
@@ -141,7 +142,7 @@ conf_mat_resampled(nb_rs, tidy = FALSE) %>% #compute matrix for each fold then a
   autoplot(type = "heatmap")
 ```
 
-Hmm, let's try a different model. 
+Hmm, let's try a different model.
 
 Lasso classification uses regularization on regression to produce a simpler, more generalizable model. It learns how much of a penalty to apply to features, reducing the high-dimensional space of tokens — sometimes shrinking coefficients all the way to 0, effectively removing those features from the model entirely.
 
@@ -166,15 +167,14 @@ tune_spec
 ```
 
 Here we use grid_regular() to create 30 possible values for the regularization penalty. Then tune_grid() fits a model at each of those values.
+
 ```{r}
 lambda_grid <- grid_regular(penalty(), levels = 30) 
 
 lambda_grid
 ```
 
-
-
-> **Python parallel:** `grid_regular(penalty(), levels = 30)` + `tune_grid()` is akin to using `GridSearchCV().
+> **Python parallel:** `grid_regular(penalty(), levels = 30)` + `tune_grid()` is akin to using \`GridSearchCV().
 
 ```{r tune}
 lasso_wf <- workflow() %>% 
@@ -280,7 +280,7 @@ Grading for this lab weights **interpretation and documentation more heavily tha
 
 ### Tasks
 
-**1.** Select a third classification algorithm beyond Naive Bayes and Lasso (e.g., random forest, k-nearest neighbors, support vector machine, decision tree).  Report its cross-validated accuracy and ROC AUC.
+**1.** Select a third classification algorithm beyond Naive Bayes and Lasso (e.g., random forest, k-nearest neighbors, support vector machine, decision tree). Report its cross-validated accuracy and ROC AUC.
 
 **2.** Identify the key hyperparameter(s) for your chosen algorithm. Tune at least one hyperparameter using cross-validation and select a final value. Briefly explain in plain language what the hyperparameter controls and why tuning it matters.
 
